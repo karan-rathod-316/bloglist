@@ -42,9 +42,9 @@ blogsRouter.post("/", (req, res, next) => {
 });
 
 blogsRouter.delete("/:id", (req, res, next) => {
-  Blog.findByIdAndRemove(request.params.id)
+  Blog.findByIdAndRemove(req.params.id)
     .then(() => {
-      response.status(204).end();
+      res.status(204).end();
     })
     .catch((error) => next(error));
 });
