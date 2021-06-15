@@ -49,8 +49,8 @@ blogsRouter.delete("/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-blogsRouter.put("/:id", (request, response, next) => {
-  const body = request.body;
+blogsRouter.put("/:id", (req, res, next) => {
+  const body = req.body;
 
   const blog = {
     title: body.title,
@@ -59,9 +59,9 @@ blogsRouter.put("/:id", (request, response, next) => {
     likes: body.likes,
   };
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+  Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
     .then((updatedNote) => {
-      response.json(updatedNote);
+      res.json(updatedNote);
     })
     .catch((error) => next(error));
 });
