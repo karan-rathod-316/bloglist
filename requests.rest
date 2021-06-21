@@ -2,7 +2,7 @@ GET http://localhost:3002/api/blogs HTTP/1.1
 
 ###
 
-GET http://localhost:3002/api/blogs/60bfaa57d480180a84a37198 HTTP/1.1
+GET http://localhost:3002/api/blogs/60cf17e0bf984a3022c73309 HTTP/1.1
 
 ###
 
@@ -15,3 +15,10 @@ Content-Type: application/json
   "url": "test",
   "likes": 123
 }
+
+###
+
+DELETE http://localhost:3002/api/blogs/60cf17e0bf984a3022c73309 HTTP/1.1
+
+
+

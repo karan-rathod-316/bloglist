@@ -1,5 +1,4 @@
-const dummy = (blogs) => {
-  console.log(blogs);
+const dummy = () => {
   return 1;
 };
 
@@ -22,4 +21,10 @@ const favoriteBlog = (blogs) => {
   let result = sortedBlogs[0];
   return result;
 };
-module.exports = { dummy, totalLikes, favoriteBlog };
+
+const missingLike = (blog) => {
+  if (!blog.like) {
+    return 0;
+  }
+};
+module.exports = { dummy, totalLikes, favoriteBlog, missingLike };

@@ -1,4 +1,4 @@
-const listHelper = require("../utils/list_helper");
+const blogListHelper = require("../utils/bloglist_helper");
 
 const listWithOneBlog = [
   {
@@ -14,7 +14,7 @@ const listWithOneBlog = [
 test("test returns one", () => {
   const blogs = [];
 
-  const result = listHelper.dummy(blogs);
+  const result = blogListHelper.dummy(blogs);
   expect(result).toBe(1);
 });
 
@@ -71,24 +71,24 @@ const listWithMultipleBlogs = [
 
 describe("total likes", () => {
   test("in one blog when only one blog is present", () => {
-    const result = listHelper.totalLikes(listWithOneBlog);
+    const result = blogListHelper.totalLikes(listWithOneBlog);
     expect(result).toBe(5);
   });
 
   test("of empty list is zero", () => {
-    const result = listHelper.totalLikes([]);
+    const result = blogListHelper.totalLikes([]);
     expect(result).toBe(0);
   });
 
   test("of a bigger list is calculated right", () => {
-    const result = listHelper.totalLikes(listWithMultipleBlogs);
+    const result = blogListHelper.totalLikes(listWithMultipleBlogs);
     expect(result).toBe(36);
   });
 });
 
 describe("most likes", () => {
   test("in one blog when only one blog is present", () => {
-    const result = listHelper.favoriteBlog(listWithMultipleBlogs);
+    const result = blogListHelper.favoriteBlog(listWithMultipleBlogs);
     expect(result).toEqual({
       _id: "5a422b3a1b54a676234d17f9",
       title: "Canonical string reduction",
