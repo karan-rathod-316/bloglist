@@ -8,11 +8,12 @@ GET http://localhost:3002/api/blogs/60cf17e0bf984a3022c73309 HTTP/1.1
 
 POST http://localhost:3002/api/blogs HTTP/1.1
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvZXlfdHJpYnMiLCJpZCI6IjYwZDk2NzM3MDBlNjQ3MmFhNzBjYzAyMyIsImlhdCI6MTYyNDk0NzkxNH0.4GqH-tskwLAq9PK58YzBg_y2T1_9a1ua_ZO-Gfv47CA
 
 {
-  "title": "test",
-  "author": "test",
-  "url": "test",
+  "title": "Testauth",
+  "author": "Testauth",
+  "url": "Testauth",
   "likes": 123
 }
 
@@ -21,4 +22,5 @@ Content-Type: application/json
 DELETE http://localhost:3002/api/blogs/60cf17e0bf984a3022c73309 HTTP/1.1
 
 
+###
 
