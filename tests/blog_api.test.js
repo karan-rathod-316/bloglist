@@ -25,8 +25,16 @@ beforeEach(async () => {
   await Blog.deleteMany({});
   let blogOne = new Blog(listWithMultipleBlogs[0]);
   await blogOne.save();
-  let blogTwo = new Blog(listWithMultipleBlogs[0]);
+  let blogTwo = new Blog(listWithMultipleBlogs[1]);
   await blogTwo.save();
+
+  const newUser = {
+    username: "Mirko",
+    name: "Dude",
+    password: "CrowCrop",
+  };
+
+  await api.post("/api/users").send(newUser);
 });
 
 test("current number of blogs are returned", async () => {
@@ -48,6 +56,17 @@ test("identifier property is named id", async () => {
 });
 
 test("verify that a new blog gets added", async () => {
+  const loginUser = {
+    username: "Mirko",
+    password: "CrowCrop",
+  };
+
+  const loggedUser = await api
+    .post("/api/login")
+    .send(loginUser)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /application\/json/);
+
   const newBlog = {
     title: "Canonical string reduction",
     author: "Edsger W. Dijkstra",
@@ -58,14 +77,27 @@ test("verify that a new blog gets added", async () => {
   await api
     .post("/api/blogs")
     .send(newBlog)
-    .expect(200)
-    .expect("Content-Type", /application\/json/);
+    .set("Authorization", `Bearer ${loggedUser.body.token}`)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /json/)
+    .expect(200);
 
   let response = await api.get("/api/blogs");
   expect(response.body).toHaveLength(3);
 });
 
 test("verify if likes are missing", async () => {
+  const loginUser = {
+    username: "Mirko",
+    password: "CrowCrop",
+  };
+
+  const loggedUser = await api
+    .post("/api/login")
+    .send(loginUser)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /application\/json/);
+
   const newBlog = {
     title: "TestLikes",
     author: "TestLikes",
@@ -75,8 +107,10 @@ test("verify if likes are missing", async () => {
   await api
     .post("/api/blogs")
     .send(newBlog)
-    .expect(200)
-    .expect("Content-Type", /application\/json/);
+    .set("Authorization", `Bearer ${loggedUser.body.token}`)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /json/)
+    .expect(200);
 
   let response = await api.get("/api/blogs");
   let likesCount = blogListHelper.missingLike(response.body);
@@ -84,12 +118,26 @@ test("verify if likes are missing", async () => {
 });
 
 test("missing title or url", async () => {
+  const loginUser = {
+    username: "Mirko",
+    password: "CrowCrop",
+  };
+
+  const loggedUser = await api
+    .post("/api/login")
+    .send(loginUser)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /application\/json/);
+
   const newBlog = {
     author: "testURLandTITLE",
     likes: 12,
   };
 
-  await api.post("/api/blogs/").send(newBlog).expect(400);
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set("Authorization", `Bearer ${loggedUser.body.token}`);
 
   let response = await api.get("/api/blogs");
   let blogCount = response.body.length;
@@ -97,17 +145,57 @@ test("missing title or url", async () => {
 });
 
 test("delete a blog", async () => {
+  const loginUser = {
+    username: "Mirko",
+    password: "CrowCrop",
+  };
+
+  const loggedUser = await api
+    .post("/api/login")
+    .send(loginUser)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /application\/json/);
+
+  const newBlog = {
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+    likes: 12,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .set("Authorization", `Bearer ${loggedUser.body.token}`)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /json/)
+    .expect(200);
+
   let blogList = await api.get("/api/blogs");
-  let ids = blogList.body.map((blog) => blog.id);
-  await api.delete(`/api/blogs/${ids[0]}`).expect(204);
+  let blogToDelete = blogList.body.find((blog) => blog.title === newBlog.title);
+  console.log(blogToDelete);
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .set("Authorization", `Bearer ${loggedUser.body.token}`);
 
   let updatedBloglist = await api.get("/api/blogs");
-  expect(updatedBloglist.body.length).toEqual(listWithMultipleBlogs.length - 1);
+  expect(updatedBloglist.body.length).toEqual(listWithMultipleBlogs.length);
 });
 
 test("verify that a blog can be updated", async () => {
+  const loginUser = {
+    username: "Mirko",
+    password: "CrowCrop",
+  };
+
+  const loggedUser = await api
+    .post("/api/login")
+    .send(loginUser)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /application\/json/);
+
   const response = await api.get("/api/blogs");
-  const blogId = response.body[0].id;
+  const blogId = response.body[response.body.length - 1].id;
 
   const updatedBlog = {
     title: "TestPutRequest",
@@ -119,7 +207,10 @@ test("verify that a blog can be updated", async () => {
   await api
     .put(`/api/blogs/${blogId}`)
     .send(updatedBlog)
-    .expect("Content-Type", /application\/json/);
+    .set("Authorization", `Bearer ${loggedUser.body.token}`)
+    .set("Accept", "application/json")
+    .expect("Content-Type", /json/)
+    .expect(200);
 
   let updatedBlogList = await api.get(`/api/blogs/${blogId}`);
   expect(updatedBlogList.body.title).toEqual(updatedBlog.title);
