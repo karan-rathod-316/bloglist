@@ -1,6 +1,8 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const Like = require("../models/Likes");
+
 const jwt = require("jsonwebtoken");
 
 blogsRouter.get("/", async (req, res) => {
@@ -73,8 +75,10 @@ blogsRouter.delete("/:id", async (req, res) => {
 });
 
 blogsRouter.put("/:id", async (req, res) => {
-  let body = req.body;
+  const blog = await Blog.findById(req.params.id);
+  const blogCreatorsId = blog.user;
 
+  let body = req.body;
   const decodedToken = jwt.verify(req.token, process.env.SECRET);
 
   if (!req.token || !decodedToken) {
@@ -93,15 +97,35 @@ blogsRouter.put("/:id", async (req, res) => {
       author: body.author,
       url: body.url,
       likes: body.likes,
-      user: user._id,
+      user: blogCreatorsId,
     };
 
-    await Blog.findByIdAndUpdate(req.params.id, blog, {
-      new: true,
+    const like = new Like({
+      like: true,
+      username: user.username,
+      blogTitle: blog.title,
     });
 
-    let updatedBlog = await Blog.findById(req.params.id);
-    res.json(updatedBlog);
+    let allLikes = await Like.find({});
+
+    let checkIfPostAlreadyLiked = allLikes.find((savedLike) => {
+      return (
+        savedLike.username === user.username &&
+        savedLike.blogTitle === blog.title
+      );
+    });
+    if (!checkIfPostAlreadyLiked) {
+      await like.save();
+
+      await Blog.findByIdAndUpdate(req.params.id, blog, {
+        new: true,
+      });
+
+      let updatedBlog = await Blog.findById(req.params.id);
+      res.json(updatedBlog);
+    } else {
+      res.json("Post already liked");
+    }
   }
 });
 
